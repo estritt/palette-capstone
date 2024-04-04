@@ -2,6 +2,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 
+#need to implement bcrypt password field
+
 from config import db, metadata, bcrypt
 [ Column, Integer, String, Text, Boolean, File, TimeStamp, func, ForeignKey, relationship, CheckConstraint ] = [
     db.Column, db.Integer, db.String, db.Text, db.Boolean, db.File, db.TimeStamp, db.func, db.ForeignKey, db.relationship, db.CheckConstraint
