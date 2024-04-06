@@ -11,6 +11,8 @@ flask-cors = "*"
 flask-migrate = "*"
 flask-restful = "*"
 flask-sqlalchemy = "*"
+flask-login = "*"
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 
