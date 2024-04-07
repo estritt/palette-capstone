@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import React from 'react'; //this is supposed to import automatically in this version but doesn't
 
 function App() {
   return (

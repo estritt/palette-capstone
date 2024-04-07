@@ -252,6 +252,39 @@ class LikeByID(Resource):
 
 api.add_resource(LikeByID, '/likes/<int:id>')
 
+class Login(Resource):
+
+    def post(self):
+        #takes unhashed password
+        user = User.query.filter_by(username = request.get_json()['username']).first()
+        password = request.get_json()['password']
+        if user.authenticate(password):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            return make_response(user_schema.dump(user), 200)
+        return make_response({'error': 'Not the password associated with that username'}, 401)
+
+api.add_resource(Login, '/login')
+
+class CheckSession(Resource):
+
+    def get(self):
+        user = User.query.filter_by(id=session.get('user_id')).first()
+        if user:
+            return make_response(user_schema.dump(user), 200)
+        return make_response({'message': '401: Not Authorized'}, 401)
+
+api.add_resource(CheckSession, '/check_session')
+
+class Logout(Resource):
+
+    def delete(self):
+        session['user_id'] = None
+        session['username'] = None
+        return {'message': '204: No Content'}, 204
+    
+api.add_resource(Logout, '/logout')
+
 # class Posts(Resource):
 
 #     def get(self):
