@@ -16,8 +16,10 @@ function NavBar() {
 
     return (
         <Navbar bg='primary' data-bs-theme='light' className='justify-content-between p-2' sticky='top'>
-            <Nav>
-                <NavLink as={Link} to='/'>Home</NavLink>
+            <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }}>
+                <NavLink as={Link} to='/'>Home</NavLink> 
+                {/* this should force reload but doesn't seem to */}
+                <Nav.Link as={Link} to='/following'>Following</Nav.Link>
             </Nav>
         </Navbar>
     );
