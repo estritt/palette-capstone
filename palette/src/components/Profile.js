@@ -21,10 +21,14 @@ function Profile() {
 
     return (
         <Container fluid className='p-6'>
-            <Row className='border border-secondary square rounded-2 p-5 mb-0'>
+            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5'>
             <Col xs={4} className='p-1 ms-5'>
-                    <p >hello!</p>
+                    <p >profile info!</p>
                 </Col>
+            </Row>
+            
+            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-0'>
+
             </Row>
         </Container>
     );
