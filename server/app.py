@@ -1,6 +1,8 @@
-from flask import make_response, jsonify, request, session
+from flask import make_response, jsonify, request, session, send_file
 from flask_restful import Resource
 from marshmallow import fields # need these for nested structures
+from werkzeug.utils import secure_filename
+import os
 
 from config import app, db, api, ma
 # should use marshmallow validation
@@ -68,10 +70,7 @@ class UserSchema(ma.SQLAlchemySchema):
     following = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username",)))
     followed_by = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username",)))
     # ^ following and followed_by are ugly and deeply nested but it will work for now
-    # followed_by = fields.List(fields.String, attribute="followed_by")
 
-    # posts = auto_field()
-    # posts = fields.Nested(lambda: EntitySchema(exclude=("",)))
     posts = fields.Nested(lambda: EntitySchema(many=True, exclude=("user_c", "user_p")))
     comments = fields.Nested(lambda: EntitySchema(many=True, exclude=("user_c", "user_p")))
     # has_liked = fields.Nested(lambda: likes_schema)
@@ -107,6 +106,33 @@ class UsersByID(Resource):
         return patcher(id, User, user_schema)
 
 api.add_resource(UsersByID, '/users/<int:id>')
+
+class AvatarSchema(ma.Schema): #add validation!
+    #as of now, could handle avatars and artworks with one schema instead
+
+    file = fields.Raw(required=True)
+    file_path = fields.String()
+
+avatar_schema = AvatarSchema()
+# avatars_schema = AvatarSchema(many=True)
+
+class Avatars(Resource):
+
+    def post(self):
+        file_data = request.files['image']
+        filename = secure_filename(file_data.filename)
+        file_path = os.path.join('./avatars', filename)
+        file_data.save(file_path)
+        return make_response(avatar_schema.dump({'file': file_data, 'file_path': file_path}), 201)
+
+api.add_resource(Avatars, '/avatars')
+
+class AvatarFromPath(Resource):
+
+    def get(self, path):
+        return send_file(path, mimetype='image/jpeg')
+    
+api.add_resource(AvatarFromPath, '/avatars/<str:path>')
 
 # i considered handling new follows/likes with patch requests to user and entity but that isn't restful
 class FollowSchema(ma.SQLAlchemySchema): 
@@ -211,6 +237,31 @@ class EntityByID(Resource):
         return patcher(id, Entity, entity_schema)
     
 api.add_resource(EntityByID, '/entities/<int:id>')
+
+class ArtworkSchema(ma.Schema): #add validation!
+
+    file = fields.Raw(required=True)
+    file_path = fields.String()
+
+artwork_schema = ArtworkSchema()
+
+class Artworks(Resource):
+
+    def post(self):
+            file_data = request.files['image']
+            filename = secure_filename(file_data.filename)
+            file_path = os.path.join('./artworks', filename)
+            file_data.save(file_path)
+            return make_response(artwork_schema.dump({'file': file_data, 'file_path': file_path}), 201)
+
+api.add(Artworks, '/artworks')
+
+class ArtworkFromPath(Resource): #the exact same as the one for avatars :/
+
+    def get(self, path):
+        return send_file(path, mimetype='image/jpeg')
+
+api.add(ArtworkFromPath, '/artworks/<str:path>')
     
 class LikeSchema(ma.SQLAlchemySchema):
 
