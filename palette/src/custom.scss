@@ -1,0 +1,19 @@
+$primary: #dab2f5;
+
+.p-6 {
+    padding: 6rem !important;  
+    // this would be ($spacer * 6) where spacer is at the default value of 1rem
+}
+
+@font-face {
+    font-family:"century-gothic";
+    src:url("https://use.typekit.net/af/afc5c6/00000000000000003b9b1f23/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/afc5c6/00000000000000003b9b1f23/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/afc5c6/00000000000000003b9b1f23/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+    font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
+}
+  
+body {
+    font-family: 'century-gothic', Arial, sans-serif !important;
+}
+
+// @import 'bootstrap/dist/css/bootstrap.min.css';
+@import '~bootstrap/scss/bootstrap.scss';

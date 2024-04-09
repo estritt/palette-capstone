@@ -32,7 +32,7 @@ const routes = [
                 element: <Following />
             },
             {
-                path: '/artwork',
+                path: '/artwork/:id',
                 element: <Artwork />
             },
             {
@@ -40,7 +40,7 @@ const routes = [
                 element: <Drafts />
             },
             {
-                path: '/profile',
+                path: '/profile/:id',
                 element: <Profile />
             },
             {
