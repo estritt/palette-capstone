@@ -108,6 +108,7 @@ class UsersByID(Resource):
 api.add_resource(UsersByID, '/users/<int:id>')
 
 class AvatarSchema(ma.Schema): #add validation!
+    #should add urls?
     #as of now, could handle avatars and artworks with one schema instead
 
     file = fields.Raw(required=True)
@@ -116,10 +117,15 @@ class AvatarSchema(ma.Schema): #add validation!
 avatar_schema = AvatarSchema()
 # avatars_schema = AvatarSchema(many=True)
 
-class Avatars(Resource):
+class Avatars(Resource): 
 
     def post(self):
         file_data = request.files['image']
+
+        errors = avatar_schema.validate({'file': file_data})
+        if errors:
+            return make_response({'errors': errors}, 400)
+
         filename = secure_filename(file_data.filename)
         file_path = os.path.join('./avatars', filename)
         file_data.save(file_path)
@@ -249,6 +255,11 @@ class Artworks(Resource):
 
     def post(self):
             file_data = request.files['image']
+
+            errors = avatar_schema.validate({'file': file_data})
+            if errors:
+                return make_response({'errors': errors}, 400)
+    
             filename = secure_filename(file_data.filename)
             file_path = os.path.join('./artworks', filename)
             file_data.save(file_path)
