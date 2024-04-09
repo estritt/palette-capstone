@@ -37,6 +37,7 @@ class User(db.Model):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(30), nullable=False, unique=True) # VARCHAR(30)
+    avatar_path = Column(String)
     _password_hash = Column(String, nullable=False) # need private version as column
     bio = Column(Text)
     created_at = Column(TIMESTAMP, server_default=db.func.now()) # sqlite specifically stores datetime objects as strings and converts them back
@@ -51,10 +52,11 @@ class User(db.Model):
     posts = relationship('Entity', primaryjoin="and_(User.id == Entity.user_id, Entity.parent_id.is_(None))", back_populates='user_p', viewonly=True)
     comments = relationship('Entity', primaryjoin="and_(User.id == Entity.user_id, Entity.parent_id.is_not(None))", back_populates='user_c', viewonly=True)
 
-    def __init__(self, username, password, bio=None):
+    def __init__(self, username, password, avatar_path=None, bio=None):
         # an init method ensures password hashing is carried out
         self.username = username
         self.password_hash = password
+        self.avatar_path = avatar_path
         self.bio = bio
 
     @hybrid_property
