@@ -8,6 +8,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 #a lot of relationships should be set to read-only. I don't want to patch a user to have a new liked entity, I want to post a new row to likes
 
+# artwork path should be changed to artwork filename
+
 from config import db, metadata, bcrypt
 [ Column, Integer, String, Text, Boolean, TIMESTAMP, func, ForeignKey, relationship, CheckConstraint ] = [
     db.Column, db.Integer, db.String, db.Text, db.Boolean, db.TIMESTAMP, db.func, db.ForeignKey, db.relationship, db.CheckConstraint
@@ -37,7 +39,7 @@ class User(db.Model):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(30), nullable=False, unique=True) # VARCHAR(30)
-    avatar_path = Column(String)
+    avatar_filename = Column(String)
     _password_hash = Column(String, nullable=False) # need private version as column
     bio = Column(Text)
     created_at = Column(TIMESTAMP, server_default=db.func.now()) # sqlite specifically stores datetime objects as strings and converts them back
@@ -52,11 +54,11 @@ class User(db.Model):
     posts = relationship('Entity', primaryjoin="and_(User.id == Entity.user_id, Entity.parent_id.is_(None))", back_populates='user_p', viewonly=True)
     comments = relationship('Entity', primaryjoin="and_(User.id == Entity.user_id, Entity.parent_id.is_not(None))", back_populates='user_c', viewonly=True)
 
-    def __init__(self, username, password, avatar_path=None, bio=None):
+    def __init__(self, username, password, avatar_filename=None, bio=None):
         # an init method ensures password hashing is carried out
         self.username = username
         self.password_hash = password
-        self.avatar_path = avatar_path
+        self.avatar_filename = avatar_filename
         self.bio = bio
 
     @hybrid_property

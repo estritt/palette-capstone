@@ -12,14 +12,16 @@ if __name__ == '__main__':
         Follow.query.delete()
 
         print("Creating users...")
-        first_user = User(username='first', password='1234', bio='first bio')
+        first_user = User(username='first', avatar_filename='test.jpg', password='1234', bio='"A fox passing through the wood on business of his own stopped several minutes and sniffed. \'Hobbits!\' he thought. \'Well, what next? I have heard of strange doings in this land, but I have seldom heard of a hobbit sleeping out of doors under a tree. Three of them! There\'s something mighty queer behind this.\' He was quite right, but he never found out any more about it."')
         second_user = User(username='no_bio', password='1234')
         db.session.add_all([first_user, second_user])
         db.session.commit()
 
         print("Creating posts...")
-        first_post = Entity(user_id=first_user.id, published=True, title='test title', artwork_path='test_path', body='Here\'s a tree!')
-        db.session.add(first_post)
+        # artwork will have to already be in directory
+        first_post = Entity(user_id=first_user.id, published=True, title='test title', artwork_path='test.jpg', body='Here\'s a tree!')
+        second_post = Entity(user_id=first_user.id, published=True, title='carapaintovaggio', artwork_path='055e0be1545b4b87a1a66711d2a84441.jpg', body='Credit to Double Brother')
+        db.session.add_all([ first_post, second_post ])
         db.session.commit()
 
         print("Creating comments...")

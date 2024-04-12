@@ -4,7 +4,7 @@ import Home from './components/Home'
 import Create from './components/Create'
 import Login from './components/Login'
 import Following from './components/Following'
-import Artwork from './components/Artwork'
+import Post from './components/Post'
 import Drafts from './components/Drafts'
 import Profile from './components/Profile'
 import About from './components/About'
@@ -13,7 +13,7 @@ const routes = [
     {
         path: '/',
         element: <App />,
-        errorElement: <Home />, // make error page
+        // errorElement: <Home />, // make error page
         children: [
             {
                 path: '/',
@@ -32,8 +32,8 @@ const routes = [
                 element: <Following />
             },
             {
-                path: '/artwork/:id',
-                element: <Artwork />
+                path: '/post/:filename',
+                element: <Post />
             },
             {
                 path: '/drafts',

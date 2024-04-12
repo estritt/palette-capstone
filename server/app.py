@@ -3,12 +3,16 @@ from flask_restful import Resource
 from marshmallow import fields # need these for nested structures
 from werkzeug.utils import secure_filename
 import os
+from uuid import uuid4
 
 from config import app, db, api, ma
 # should use marshmallow validation
-
 from models import User, Follow, Entity, Like
 auto_field = ma.auto_field
+
+# need to break up views to not return so much! 
+
+# should make paginated posts and comments
 
 #might be more restful to use username instead of id in the returned url?
 
@@ -64,11 +68,12 @@ class UserSchema(ma.SQLAlchemySchema):
     # id = ma.auto_field(dump_only=True) #url will handle this
     username = auto_field()
     bio = auto_field()
+    avatar_filename = auto_field()
     created_at = auto_field(dump_only=True)
     # following = auto_field()
     # followed_by = auto_field()
-    following = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username",)))
-    followed_by = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username",)))
+    following = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username", 'following_user.url.self')))
+    followed_by = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username", 'following_user.url.self')))
     # ^ following and followed_by are ugly and deeply nested but it will work for now
 
     posts = fields.Nested(lambda: EntitySchema(many=True, exclude=("user_c", "user_p")))
@@ -111,8 +116,9 @@ class AvatarSchema(ma.Schema): #add validation!
     #should add urls?
     #as of now, could handle avatars and artworks with one schema instead
 
-    file = fields.Raw(required=True)
-    file_path = fields.String()
+    # file = fields.Raw(required=True) # FileStorage not serializable ? 
+    # need to use file.read if i want to send the file contents in a serializable format for marshmallow to validate
+    file_path = fields.String(required=True)
 
 avatar_schema = AvatarSchema()
 # avatars_schema = AvatarSchema(many=True)
@@ -121,24 +127,32 @@ class Avatars(Resource):
 
     def post(self):
         file_data = request.files['image']
+        # filename = secure_filename(file_data.filename)
+        filename = secure_filename(uuid4().hex) + '.jpg' #i dont think secure filename will ever do anything here
+        file_path = os.path.join('./avatars/', filename)
 
-        errors = avatar_schema.validate({'file': file_data})
+        errors = avatar_schema.validate({'file_path': file_path}) #make validations
         if errors:
             return make_response({'errors': errors}, 400)
 
-        filename = secure_filename(file_data.filename)
-        file_path = os.path.join('./avatars', filename)
         file_data.save(file_path)
-        return make_response(avatar_schema.dump({'file': file_data, 'file_path': file_path}), 201)
+        # return make_response(avatar_schema.dump({'file': file_data, 'file_path': file_path}), 201)
+        return make_response({'filename': filename, 'file_path': file_path}, 201)
 
 api.add_resource(Avatars, '/avatars')
 
-class AvatarFromPath(Resource):
-
-    def get(self, path):
+class ImageFromPath(Resource):
+    def get(self, path): #might want validation since this only should be used for paths with avatar or artwork
         return send_file(path, mimetype='image/jpeg')
     
-api.add_resource(AvatarFromPath, '/avatars/<str:path>')
+api.add_resource(ImageFromPath, '/images/<path:path>')
+
+# class AvatarFromPath(Resource):
+
+#     def get(self, path):
+#         return send_file(path, mimetype='image/jpeg')
+    
+# api.add_resource(AvatarFromPath, '/avatars/<path:path>')
 
 # i considered handling new follows/likes with patch requests to user and entity but that isn't restful
 class FollowSchema(ma.SQLAlchemySchema): 
@@ -204,13 +218,13 @@ class EntitySchema(ma.SQLAlchemySchema):
     last_updated = auto_field()
 
     # user_p = auto_field()
-    user_p = fields.Nested(lambda: UserSchema(only=('username',)))
+    user_p = fields.Nested(lambda: UserSchema(only=('username', 'url.self', 'avatar_filename')))
     # user_c = auto_field()
-    user_c = fields.Nested(lambda: UserSchema(only=('username',)))
+    user_c = fields.Nested(lambda: UserSchema(only=('username', 'url.self', 'avatar_filename')))
     # children = auto_field()
     children = fields.Nested(lambda: entities_schema)
     # liked_by = auto_field()
-    liked_by = fields.Nested(lambda: UserSchema(many=True, only=('username',)))
+    liked_by = fields.Nested(lambda: UserSchema(many=True, only=('username', 'url.self')))
 
     url = ma.Hyperlinks(
         {
@@ -244,10 +258,26 @@ class EntityByID(Resource):
     
 api.add_resource(EntityByID, '/entities/<int:id>')
 
+class Posts(Resource):
+
+    def get(self):
+        posts = Entity.query.filter(Entity.parent_id.is_(None), Entity.published.is_(True)).all()
+        return make_response(EntitySchema(only=('url.self', 'artwork_path', 'title'), many=True).dump(posts), 200)
+    
+api.add_resource(Posts, '/posts')
+
+class PostByFilename(Resource):
+
+    def get(self, filename):
+        post = Entity.query.filter(Entity.parent_id.is_(None), Entity.published.is_(True), Entity.artwork_path.is_(filename)).first()
+        return make_response(entity_schema.dump(post), 200)
+    
+api.add_resource(PostByFilename, '/posts/<path:filename>')
+
 class ArtworkSchema(ma.Schema): #add validation!
 
-    file = fields.Raw(required=True)
-    file_path = fields.String()
+    # file = fields.Raw(required=True)
+    file_path = fields.String(required=True)
 
 artwork_schema = ArtworkSchema()
 
@@ -255,24 +285,25 @@ class Artworks(Resource):
 
     def post(self):
             file_data = request.files['image']
+            # filename = secure_filename(file_data.filename)
+            filename = secure_filename(uuid4().hex) + '.jpg'
+            file_path = os.path.join('./artworks/', filename)
 
-            errors = avatar_schema.validate({'file': file_data})
+            errors = avatar_schema.validate({'file_path': file_path})
             if errors:
                 return make_response({'errors': errors}, 400)
-    
-            filename = secure_filename(file_data.filename)
-            file_path = os.path.join('./artworks', filename)
+            
             file_data.save(file_path)
-            return make_response(artwork_schema.dump({'file': file_data, 'file_path': file_path}), 201)
+            return make_response(artwork_schema.dump({'filename': filename, 'file_path': file_path}), 201)
 
-api.add(Artworks, '/artworks')
+api.add_resource(Artworks, '/artworks')
 
-class ArtworkFromPath(Resource): #the exact same as the one for avatars :/
+# class ArtworkFromPath(Resource): #the exact same as the one for avatars :/
 
-    def get(self, path):
-        return send_file(path, mimetype='image/jpeg')
+#     def get(self, path):
+#         return send_file(path, mimetype='image/jpeg')
 
-api.add(ArtworkFromPath, '/artworks/<str:path>')
+# api.add_resource(ArtworkFromPath, '/artworks/<path:path>')
     
 class LikeSchema(ma.SQLAlchemySchema):
 
