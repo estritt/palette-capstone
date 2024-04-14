@@ -1,6 +1,7 @@
 from flask import make_response, jsonify, request, session, send_file
 from flask_restful import Resource
 from marshmallow import fields # need these for nested structures
+from sqlalchemy import desc
 from werkzeug.utils import secure_filename
 import os
 from uuid import uuid4
@@ -72,9 +73,10 @@ class UserSchema(ma.SQLAlchemySchema):
     created_at = auto_field(dump_only=True)
     # following = auto_field()
     # followed_by = auto_field()
-    following = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username", 'following_user.url.self')))
+    following = fields.Nested(lambda: FollowSchema(many=True, only=("followed_user.username", 'followed_user.url.self')))
     followed_by = fields.Nested(lambda: FollowSchema(many=True, only=("following_user.username", 'following_user.url.self')))
     # ^ following and followed_by are ugly and deeply nested but it will work for now
+    # also the urls aren't showing up
 
     posts = fields.Nested(lambda: EntitySchema(many=True, exclude=("user_c", "user_p")))
     comments = fields.Nested(lambda: EntitySchema(many=True, exclude=("user_c", "user_p")))
@@ -266,6 +268,23 @@ class Posts(Resource):
     
 api.add_resource(Posts, '/posts')
 
+class PostsFromFollowing(Resource):
+
+    def get(self):
+        if not session.get('user_id'):
+            return make_response({'error': 'not logged in'}, 401)
+        page_number = request.args.get('page', 1)
+        page_size = request.args.get('size', 10)
+        offset = (page_number - 1) * page_size
+        active_user = User.query.filter_by(id=session['user_id']).first()
+        followed_usernames = [entry.followed_user.username for entry in active_user.following] # over-nested
+        followed_posts = Entity.query.filter(Entity.parent_id.is_(None), Entity.user.username.in_(followed_usernames)).order_by(desc(Entity.created_at)).offset(offset).limit(page_size).all()
+        return make_response({'posts': entities_schema.dump(followed_posts),
+                              'page': page_number,
+                              'size': page_size}, 200)
+    
+api.add_resource(PostsFromFollowing, '/posts-from-following')
+
 class PostByFilename(Resource):
 
     def get(self, filename):
@@ -297,13 +316,6 @@ class Artworks(Resource):
             return make_response(artwork_schema.dump({'filename': filename, 'file_path': file_path}), 201)
 
 api.add_resource(Artworks, '/artworks')
-
-# class ArtworkFromPath(Resource): #the exact same as the one for avatars :/
-
-#     def get(self, path):
-#         return send_file(path, mimetype='image/jpeg')
-
-# api.add_resource(ArtworkFromPath, '/artworks/<path:path>')
     
 class LikeSchema(ma.SQLAlchemySchema):
 
@@ -371,10 +383,12 @@ api.add_resource(CheckSession, '/check_session')
 
 class Logout(Resource):
 
-    def delete(self):
+    def delete(self): # 204 response can't have body so we are including a header
         session['user_id'] = None
         session['username'] = None
-        return {'message': '204: No Content'}, 204
+        response = make_response('', 204)
+        response.headers['message'] = '204: No Content'
+        return response
     
 api.add_resource(Logout, '/logout')
 

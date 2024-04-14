@@ -27,8 +27,9 @@ function NavBar() {
                 <NavLink className='me-auto' as={Link} to='/create'>Create</NavLink>
                 { activeUser ? 
                     <>
-                        <NavLink as={Link} to={'/users/' + activeUser.username}>{activeUser.username}</NavLink>
-                        <NavLink class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {/* not a great way to get url */}
+                        <NavLink as={Link} to={'/profile/' + activeUser.url.self.slice(-1)}>{activeUser.username}</NavLink> 
+                        <NavLink className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Dropdown
                         </NavLink>
                     </> : <>

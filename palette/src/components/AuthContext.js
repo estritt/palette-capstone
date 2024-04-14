@@ -44,14 +44,14 @@ export const AuthProvider = ({ children }) => {
             method: 'DELETE',
             headers:{"Content-Type": "application/json",},
         })
-        .then(response => response.ok ? response.json() : Promise.reject())
+        .then(response => response.ok ? response.headers.message : Promise.reject())
         .then(() => setActiveUser(null))
         .catch(error => {
             console.error('Logout error:', error);
         });
     };
 
-    const value = { // check shoul be run without giving it in value
+    const value = { // check should be run without giving it in value
         activeUser,
         login,
         logout

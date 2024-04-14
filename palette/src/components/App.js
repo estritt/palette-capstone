@@ -12,6 +12,8 @@ import NavBar from './NavBar'
 // import About from './About'
 import { AuthProvider } from './AuthContext';
 
+// there is a ton of repetitive element-specific styling done with bootstrap. a css page would help
+
 function App() {
   return (
     <AuthProvider>

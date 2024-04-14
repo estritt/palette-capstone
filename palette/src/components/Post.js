@@ -28,7 +28,7 @@ function Post() {
 
     return (
         <Container fluid className='p-6'>
-            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5'>
+            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': '#ECECEC'}}>
                 <Col>
                     <img  
                         src = {artwork}
@@ -36,7 +36,7 @@ function Post() {
                     />
                 </Col>
             </Row>
-            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5'>
+            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': '#ECECEC'}}>
                 {/* {post.children ? <RenderChildren post={post} /> : <></>} */}
                 <Comment comment={post} />
             </Row>
