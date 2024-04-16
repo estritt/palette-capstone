@@ -286,12 +286,27 @@ class PostsFromFollowing(Resource):
 api.add_resource(PostsFromFollowing, '/posts-from-following')
 
 class PostByFilename(Resource):
+# i considered removing the is published filter so this view could be used for draft editing but 
+# in that case the user would be able to fetch a post that isn't published - they'd have the response
+# even if the page didn't render. A solution for later could be to make a separate view that just checks if an entity is published
 
     def get(self, filename):
         post = Entity.query.filter(Entity.parent_id.is_(None), Entity.published.is_(True), Entity.artwork_path.is_(filename)).first()
         return make_response(entity_schema.dump(post), 200)
     
 api.add_resource(PostByFilename, '/posts/<path:filename>')
+
+class EditingPost(Resource):
+
+    def get(self, filename):
+        post = Entity.query.filter(Entity.parent_id.is_(None), Entity.artwork_path.is_(filename)).first()
+        # arg Entity.user_p.username.is_(session.get('username')) doesnt work for accessing nested attributes ig
+                                   
+        if entity_schema.dump(post)['user_p']['username'] != session.get('username'):
+            return make_response({'error': 'Not owner of post'}, 401)
+        return make_response(entity_schema.dump(post), 200)
+    
+api.add_resource(EditingPost, '/drafts/<path:filename>') # might clash when trying to implement comment editing
 
 class ArtworkSchema(ma.Schema): #add validation!
 

@@ -6,13 +6,13 @@ import Comment from './Comment';
 
 function Post() {
     
-    const {filename} = useParams();
+    const { filename } = useParams();
     const [ artwork, setArtwork ] = useState();
     const [ post, setPost ] = useState(null);
 
     useEffect(() => {
         fetch(`/posts/${filename}.jpg`) // get post by filename
-        .then(response => response.json())
+        .then(response => response.json()) // add catch!!
         .then(data => {
             setPost(data);
             fetch(`/images/artworks/${filename}.jpg`)

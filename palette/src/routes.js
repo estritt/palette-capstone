@@ -20,7 +20,7 @@ const routes = [
                 element: <Home />
             },
             {
-                path: '/create',
+                path: '/create/:artworkURL?', // ? denote optional path parameter
                 element: <Create />
             },
             {
