@@ -1,23 +1,26 @@
 import { Container, Image, Row, Col, Button, Card, Form } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useAuth } from './AuthContext';
-// import { Form } from 'react-router-dom'; //wrong form component! 
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
 
     const { activeUser, login, logout } = useAuth();
     const {setError, handleSubmit, control, reset, formState: {errors}, getValues                      
     } = useForm();
+    const navigate = useNavigate();
 
-    function onSubmit(data) {
-        console.log(data);
-        login(...Object.values(data)); // might be better to have login take a dictionary
+    const onSubmit = async (data) => {
+        // console.log(data);
+        await login(...Object.values(data)) // might be better to have login take a dictionary
+        // .then(navigate(`/profile/${activeUser.url.self.slice(-1)}`));
+        console.log(activeUser)
     }
 
     if (activeUser) {
         return (
-            <Container fluid className='p-6'>
-                <div className='border border-3 border-secondary square rounded-2 p-5 mb-5'>
+            <Container className='p-6'>
+                <div className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': 'var(--background)'}}>
                     <p className='mx-auto'>
                         You are already logged in! Do you mean to logout? 
                     </p>
@@ -28,8 +31,8 @@ function Login() {
     }
 
     return (
-        <Container fluid className='p-6'>
-            <Form onSubmit={handleSubmit(onSubmit)} onReset={reset} className='border border-3 border-secondary square rounded-2 p-5 mb-5'>
+        <Container style={{ width: '600px' }} className='p-6'>
+            <Form onSubmit={handleSubmit(onSubmit)} onReset={reset} className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': 'var(--background)'}}>
                 <Form.Group className='mb-3' controlId='username'>
                     <Form.Label>Username</Form.Label>
                     {/* <Form.Control (bootstrap)> or <Controller (hook-form)> */}
@@ -61,7 +64,8 @@ function Login() {
                         )}
                     />
                 </Form.Group>
-                <Button type='submit'>Login</Button>
+                <div className='d-flex justify-content-center'><Button type='submit'>Login</Button></div>
+                
             </Form>
         </Container>
     );

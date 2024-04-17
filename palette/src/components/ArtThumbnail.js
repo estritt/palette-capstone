@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 function ArtThumbnail(path, title) {
-    console.log('path: ' + path.path)
-    // i have no idea why i need path.path and not just path
+    // console.log('path: ' + path.path)
+    // Not sure why i need path.path and not just path
     // the json response has "artwork_path": "test.jpg
 
     const [ imageURL, setImageURL ] = useState('');
@@ -13,15 +13,15 @@ function ArtThumbnail(path, title) {
         .then(blob => setImageURL(URL.createObjectURL(blob)));
     }, []);
 
-    console.log('url: ' + imageURL)
+    // console.log('url: ' + imageURL)
 
     return (
-        // <a href={`/artwork/${id}`}>
-        <a href={'post/' + path.path.substring(0, path.path.length - 4)} > {/* clumsy way to remove .jpg */}
+        <a className='d-flex justify-content-center' href={'/post/' + path.path.substring(0, path.path.length - 4)} > {/* clumsy way to remove .jpg */}
             <img 
+                style={{'backgroundColor': 'white'}} //this is a quick fix for how many transparent images there are
                 src = {imageURL}
                 alt = {title}
-                className = 'mx-5 img-fluid flex-shrink-0'
+                className = 'img-fluid'
                 width = {200}
                 // onClick = {}
             />

@@ -1,10 +1,10 @@
 // import { useEffect } from "react";
 import React from 'react';
-import { Navbar, Form, Nav, Image, NavLink, Stack, Col, Row, NavDropdown } from 'react-bootstrap';
-import { useAuth } from './AuthContext.js';
+import { Navbar, Button, Form, Nav, Image, NavLink, Stack, Col, Row, NavDropdown } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 
+import { useAuth } from './AuthContext.js';
 
 function NavBar() {
 
@@ -22,22 +22,18 @@ function NavBar() {
             <Nav className="fs-4 flex-grow-1 my-2 my-lg-0" style={{ maxHeight: '100px' }}>
                 
                 <NavLink as={Link} to='/'>Home</NavLink> 
-                {/* this should force reload but doesn't seem to */}
-                <NavLink as={Link} to='/following'>Following</NavLink>
+                {/* home link doesn't force reload but should */}
+                {activeUser && <NavLink as={Link} to='/following'>Following</NavLink>}
                 <NavLink className='me-auto' as={Link} to='/create'>Create</NavLink>
-                { activeUser ? 
+                {activeUser ? 
                     <>
                     {/* not a great way to get url */}
                         <NavLink as={Link} to={'/profile/' + activeUser.url.self.slice(-1)}>{activeUser.username}</NavLink> 
-                        <NavLink className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                        </NavLink>
+                        <div className='px-3 d-flex align-items-center'> 
+                        {/* makes button less tall */}
+                            <Button onClick={logout} size='sm' variant='danger' style={{'color': 'white'}}>logout</Button>
+                        </div>
                     </> : <>
-                        <NavDropdown title='Test'>
-                            <NavDropdown.Item eventKey="4.1">Action</NavDropdown.Item>
-                            <NavDropdown.Item eventKey="4.2">Another action</NavDropdown.Item>
-                            <NavDropdown.Item eventKey="4.3">Something else here</NavDropdown.Item>
-                        </NavDropdown>
                         <NavLink className='justify-left' as={Link} to='/login'>Login</NavLink>
                         <NavLink as={Link} to='/login'>Signup</NavLink>
                     </> 

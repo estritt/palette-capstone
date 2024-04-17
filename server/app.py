@@ -292,6 +292,8 @@ class PostByFilename(Resource):
 
     def get(self, filename):
         post = Entity.query.filter(Entity.parent_id.is_(None), Entity.published.is_(True), Entity.artwork_path.is_(filename)).first()
+        if not post:
+            return make_response({'error': '404 post not found'}, 404)
         return make_response(entity_schema.dump(post), 200)
     
 api.add_resource(PostByFilename, '/posts/<path:filename>')
@@ -331,6 +333,19 @@ class Artworks(Resource):
             return make_response(artwork_schema.dump({'filename': filename, 'file_path': file_path}), 201)
 
 api.add_resource(Artworks, '/artworks')
+
+class ArtworkByName(Resource):
+
+    def delete(self, filename):
+        file_path = f'artworks/{filename}.jpg'
+        if not os.path.isfile(file_path):
+            return make_response({'error': '404 file not found'}, 404)
+        os.remove(file_path)
+        response = make_response('', 204)
+        response.headers['message'] = '204: No Content'
+        return response
+    
+api.add_resource(ArtworkByName, '/artworks/<path:filename>')
     
 class LikeSchema(ma.SQLAlchemySchema):
 

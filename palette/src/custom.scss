@@ -1,4 +1,5 @@
 $primary: #dab2f5;
+$danger: #d93a77;
 // $fs-7: 10px !important;
 
 .p-6 {
@@ -14,6 +15,10 @@ $primary: #dab2f5;
   
 body {
     font-family: 'century-gothic', Arial, sans-serif !important;
+}
+
+:root {
+    --background: #ECECEC;
 }
 
 // @import 'bootstrap/dist/css/bootstrap.min.css';

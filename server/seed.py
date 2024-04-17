@@ -1,6 +1,8 @@
 from app import app
 from models import db, User, Entity, Like, Follow
 
+# this file does not handle image storage yet!
+# be careful not to delete the test images
 
 if __name__ == '__main__':
     with app.app_context():

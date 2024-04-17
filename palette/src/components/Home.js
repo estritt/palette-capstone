@@ -16,10 +16,10 @@ function Home() {
 
     return (
         <Container fluid className='p-6'>
-            <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5'>
+            <Row className='border border-3 border-secondary square rounded-2 p-5 pb-0 mb-5' style={{'backgroundColor': 'var(--background)'}}>
                 {posts.map(post => {
                     return (
-                        <Col key={post.url.self}>
+                        <Col className='pb-5' xs={12} sm={6} md={4} lg={3} key={post.url.self}>
                             <ArtThumbnail path={post.artwork_path} title={post.title} />
                         </Col>
                     )
