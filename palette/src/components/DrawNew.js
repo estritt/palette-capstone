@@ -74,7 +74,7 @@ function DrawNew() {
                 fetch('/entities', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ //add all fields
+                    body: JSON.stringify({ 
                         ...data,
                         'user_id': parseInt(activeUser.url.self.slice(-1)), 
                         'published': true,
@@ -90,33 +90,29 @@ function DrawNew() {
     function SubmitDraft(data, canvasRef) {
         console.log('draft clicked:');
         console.log(data)
-        // canvasRef.current.toBlob(blob => {
-        //     const file = new File([blob], 'image', {type: 'image/jpg'})
-        //     const formData = new FormData(); // can't use JSON.stringify for files
-        //     formData.append('image', file);
-        //     fetch('/artworks', {
-        //         method: 'POST',
-        //         body: formData
-        //     })
-        //     .then(response => response.json())
-        //     .then(imageData => {
-        //         fetch(`/entities/${post.url.self.slice(-1)}`, { // pointless to use urls if reqs are done like this
-        //             method: 'PATCH',
-        //             headers: {'Content-Type': 'application/json'},
-        //             body: JSON.stringify({
-        //                 ...data,
-        //                 'published': false,
-        //                 'artwork_path': imageData.file_path.slice(11) // need to be more consistent with using path vs filename
-        //             })
-        //         })
-        //         .then(response => {
-        //             fetch(`/artworks/${post.artwork_path.slice(0,-4)}`, { // state didn't update - this is the old path 
-        //                 method: 'DELETE'
-        //             })
-        //             .then(navigate(`/drafts`))
-        //         }) 
-        //     })
-        // })
+        canvasRef.current.toBlob(blob => {
+            const file = new File([blob], 'image', {type: 'image/jpg'})
+            const formData = new FormData(); // can't use JSON.stringify for files
+            formData.append('image', file);
+            fetch('/artworks', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(imageData => {
+                fetch('/entities', { // pointless to use urls if reqs are done like this
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        ...data, 
+                        'user_id': parseInt(activeUser.url.self.slice(-1)), 
+                        'published': false,
+                        'artwork_path': imageData.file_path.slice(11)
+                    })
+                })
+                .then(navigate(`/drafts`))
+            })
+        })
     }
 
     function SubmitDownload(data, canvasRef) {
@@ -131,6 +127,7 @@ function DrawNew() {
     return ( // using rows causes the brush to be offset from the cursor
         <Container fluid className='p-6'> 
             <div className='border border-3 border-secondary square rounded-2 p-5 mb-5 ' style={{'backgroundColor': '#ECECEC'}}> 
+                {!activeUser && <p>Login before painting if you want to submit it or save a draft!</p>}
                 <DrawMenu 
                     setPrimaryColor={setPrimaryColor} 
                     setLineWidth={setLineWidth} 
@@ -184,8 +181,8 @@ function DrawNew() {
                             />
                     </Form.Group>
                     <Form.Group className='p-3 d-flex justify-content-end'>
-                        <Button className='mx-2' type='submit'>Publish</Button>
-                        <Button className='mx-2'onClick={handleSubmit(data => SubmitDraft(data, canvasRef))}>Save Draft</Button>
+                        <Button disabled={!activeUser} className='mx-2' type='submit'>Publish</Button>
+                        <Button disabled={!activeUser} className='mx-2'onClick={handleSubmit(data => SubmitDraft(data, canvasRef))}>Save Draft</Button>
                         <Button className='mx-2' onClick={handleSubmit(data => SubmitDownload(data, canvasRef))}>Download</Button>
                     </Form.Group>
                     {/* not a very clean way to handle having multiple submits with react-hook-form but it works */}

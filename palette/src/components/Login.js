@@ -14,20 +14,21 @@ function Login() {
         // console.log(data);
         await login(...Object.values(data)) // might be better to have login take a dictionary
         // .then(navigate(`/profile/${activeUser.url.self.slice(-1)}`));
-        console.log(activeUser)
+        // the above would run before activeUser was set and break so I just replaced the render for when user is active
+        // this page isn't meant to handle logouts anyways, it was just in case
     }
 
-    if (activeUser) {
-        return (
-            <Container className='p-6'>
-                <div className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': 'var(--background)'}}>
-                    <p className='mx-auto'>
-                        You are already logged in! Do you mean to logout? 
-                    </p>
-                    <Button onClick={logout}>Logout</Button>
-                </div>
-            </Container>
-        )
+    if (activeUser) { navigate(`/profile/${activeUser.url.self.slice(-1)}`); 
+        // return (
+        //     <Container className='p-6'>
+        //         <div className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': 'var(--background)'}}>
+        //             <p className='mx-auto'>
+        //                 You are already logged in! Do you mean to logout? 
+        //             </p>
+        //             <Button onClick={logout}>Logout</Button>
+        //         </div>
+        //     </Container>
+        // )
     }
 
     return (
