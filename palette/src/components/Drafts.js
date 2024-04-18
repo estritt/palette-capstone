@@ -12,7 +12,7 @@ function Drafts() {
     
     useEffect(() => {
         if (activeUser) {
-            fetch(`/drafts/${activeUser.url.self.split("=")[1]}`)
+            fetch(`/drafts/id/${activeUser.url.self.split("=")[1]}`)
             .then(response => response.json())
             .then(data => setDrafts(data))
         }

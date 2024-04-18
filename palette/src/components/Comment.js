@@ -20,7 +20,7 @@ function Comment({ comment }) {
 
     // console.log('recieved comment: ' + JSON.stringify(comment))
     // i've made a mess of the grid system
-    return (<Row className='bg-secondary square rounded-2'>
+    return (<Row className='square rounded-2' style={{'backgroundColor': '#F5F5F5'}}>
         {/* <Col className='md-auto'></Col> */}
         {!comment.parent_id ? <>
             <Col className='p-4 d-flex align-items-start'>
@@ -28,7 +28,7 @@ function Comment({ comment }) {
                     <img src={avatar} height='50rem' style={{'backgroundColor': 'white'}} /> 
                     <p className='ps-3 pt-1'>{comment.user_p.username}</p>
                 </a>
-                <Button size='sm' className='ms-3 align-self-top'>Follow</Button>
+                {/* <Button size='sm' className='ms-3 align-self-top'>Follow</Button> implement later */}
             </Col>
                 <Row><Col classname='p-4'>{comment.body}</Col></Row>
                 <Row> <Col className='pt-3'>

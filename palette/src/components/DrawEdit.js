@@ -202,6 +202,7 @@ function DrawEdit({ filename }) {
                             control={control}
                             name='title'
                             defaultValue={post.title}
+                            rules={{ required: true }} // this makes body required too somehow?
                             render={({field: { onChange, onBlur, value, ref }}) => (
                                 <Form.Control 
                                     onChange={onChange} value={value} ref={ref}
@@ -228,9 +229,11 @@ function DrawEdit({ filename }) {
                                 )} 
                             />
                     </Form.Group>
-                    <Button type='submit'>Publish</Button>
-                    <Button onClick={handleSubmit(data => SubmitDraft(data, canvasRef))}>Save Draft</Button>
-                    <Button onClick={handleSubmit(data => SubmitDownload(data, canvasRef))}>Download</Button>
+                    <Form.Group className='p-3 d-flex justify-content-end'>
+                        <Button type='submit'>Publish</Button>
+                        <Button className='mx-2' onClick={handleSubmit(data => SubmitDraft(data, canvasRef))}>Save Draft</Button>
+                        <Button className='mx-2' onClick={handleSubmit(data => SubmitDownload(data, canvasRef))}>Download</Button>
+                    </Form.Group>
                     {/* not a very clean way to handle having multiple submits with react-hook-form but it works */}
                     {/* i would normally have the event check what element submitted it but that isn't in data */}
                 </Form>

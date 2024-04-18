@@ -10,7 +10,7 @@ function Profile() { // add useAuth to check if it's ur own profile for editing
     
     const params = useParams();
     const parID = params.id;
-    const { activeUser } = useAuth();
+    const { activeUser, changeName } = useAuth();
 
     const [ profile, setProfile ] = useState(null);
     const [ isOwn, setIsOwn ] = useState(false);
@@ -71,6 +71,7 @@ function Profile() { // add useAuth to check if it's ur own profile for editing
         })
         .then(response => response.json())
         .then(updatedUser => {
+            changeName(updatedUser.username);
             setProfile(updatedUser);
             setIsEditing(!isEditing);
         });} catch {return}

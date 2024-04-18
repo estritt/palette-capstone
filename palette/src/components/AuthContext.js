@@ -39,6 +39,22 @@ export const AuthProvider = ({ children }) => {
         })
     };
 
+    const changeName = (username) => { //unsecure
+        fetch('/login', {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json',},
+            body: JSON.stringify({username}),
+        })
+        .then(response => response.ok ? response.json() : Promise.reject())
+        .then(user => {
+            setActiveUser(user);
+        })
+        .catch(error => {
+            console.error('Login error:', error);
+            setActiveUser(null);
+        })
+    };
+
     const logout = () => {
         fetch('/logout', {
             method: 'DELETE',
@@ -54,7 +70,8 @@ export const AuthProvider = ({ children }) => {
     const value = { // check should be run without giving it in value
         activeUser,
         login,
-        logout
+        logout,
+        changeName
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

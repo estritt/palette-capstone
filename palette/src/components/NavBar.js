@@ -17,13 +17,13 @@ function NavBar() {
     };
 
     return (
-        <Navbar bg='primary' data-bs-theme='light' className='d-flex justify-content-between p-2' sticky='top'>
+        <Navbar bg='primary' data-bs-theme='light' className='d-flex justify-content-between px-2' sticky='top'>
             {/* these don't have to both be flexboxes in the current state */}
             <Nav className="fs-4 flex-grow-1 my-2 my-lg-0" style={{ maxHeight: '100px' }}>
                 
                 {/* I'd use Navbar.Brand but it breaks custom styling */}
-                <NavLink as={Link} to='/'><img style={{ maxHeight: '40px' }} src='/logo.png'/></NavLink>
-                <NavLink as={Link} to='/'>Palette</NavLink> 
+                <NavLink as={Link} to='/'><img className='position-absolute top-' style={{ transform: 'translateY(-7%)', maxHeight: '40px' }} src='/logo.png'/></NavLink>
+                <NavLink as={Link} to='/' className='ps-5'>Palette</NavLink> 
                 
                 {/* home link doesn't force reload but should */}
                 {activeUser && <NavLink as={Link} to='/following'>Following</NavLink>}

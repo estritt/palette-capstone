@@ -328,7 +328,7 @@ class DraftsFromUserID(Resource):
         # other schemas for return should be specific like this one
         return make_response(EntitySchema(only=('artwork_path', 'title', 'url'), many=True).dump(drafts), 200) 
 
-api.add_resource(DraftsFromUserID, '/drafts/<int:user_id>')
+api.add_resource(DraftsFromUserID, '/drafts/id/<int:user_id>')
 
 class ArtworkSchema(ma.Schema): #add validation!
 
@@ -418,6 +418,12 @@ class Login(Resource):
             session['username'] = user.username
             return make_response(user_schema.dump(user), 200)
         return make_response({'error': 'Not the password associated with that username'}, 401)
+
+    def patch(self): #unsecure but i need to quickly handle user changing name while logged in but not giving password
+        user = User.query.filter_by(username = request.get_json()['username']).first()
+        session['username'] = user.username
+        return make_response(user_schema.dump(user), 200)
+
 
 api.add_resource(Login, '/login')
 
