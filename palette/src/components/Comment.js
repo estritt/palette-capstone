@@ -22,8 +22,9 @@ function Comment({ comment }) {
     // i've made a mess of the grid system
     return (<Row className='square rounded-2' style={{'backgroundColor': '#F5F5F5'}}>
         {/* <Col className='md-auto'></Col> */}
-        {!comment.parent_id ? <>
+        {!comment.parent_id ? <> <h4 className='pt-4'>{comment.title}</h4>
             <Col className='p-4 d-flex align-items-start'>
+                
                 <a href={'/profile/' + comment.user_p.url.self.split("=")[1]} className='d-inline-flex'>
                     <img src={avatar} height='50rem' style={{'backgroundColor': 'white'}} /> 
                     <p className='ps-3 pt-1'>{comment.user_p.username}</p>

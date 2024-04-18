@@ -30,7 +30,9 @@ function Post() {
     return (
         <Container fluid className='p-6'>
             <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': 'var(--background)'}}>
-                <Col>
+                {/* <Col>{post.title}</Col> */}
+                <Col className='d-flex justify-content-center flex-column'> 
+                {/* <div>{post.title}</div> */}
                     <img  
                         src = {artwork}
                         style = {{'backgroundColor': 'white'}}
