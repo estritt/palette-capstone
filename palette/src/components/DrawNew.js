@@ -76,7 +76,7 @@ function DrawNew() {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
                         ...data,
-                        'user_id': parseInt(activeUser.url.self.slice(-1)), 
+                        'user_id': parseInt(activeUser.url.self.split("=")[1]), 
                         'published': true,
                         'artwork_path': imageData.file_path.slice(11) // need to be more consistent with using path vs filename
                     })
@@ -88,8 +88,9 @@ function DrawNew() {
     }
 
     function SubmitDraft(data, canvasRef) {
-        console.log('draft clicked:');
         console.log(data)
+        if (data.title == "") {delete data.title;}
+        if (data.body == "") {delete data.body;}
         canvasRef.current.toBlob(blob => {
             const file = new File([blob], 'image', {type: 'image/jpg'})
             const formData = new FormData(); // can't use JSON.stringify for files
@@ -105,12 +106,12 @@ function DrawNew() {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         ...data, 
-                        'user_id': parseInt(activeUser.url.self.slice(-1)), 
+                        'user_id': parseInt(activeUser.url.self.split("=")[1]), 
                         'published': false,
                         'artwork_path': imageData.file_path.slice(11)
                     })
                 })
-                .then(navigate(`/drafts`))
+                .then(() => navigate(`/drafts`))
             })
         })
     }
@@ -148,7 +149,7 @@ function DrawNew() {
                 </div>)}
             </div>
                 <Form onSubmit={handleSubmit(data => SubmitPublish(data, canvasRef))} onReset={reset} className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': '#ECECEC'}}>
-                    <Form.Group className='mb-3' controlId='username'>
+                    <Form.Group className='mb-3' controlId='title'>
                         <Form.Label>Title</Form.Label>
                         <Controller 
                             control={control}
@@ -163,7 +164,7 @@ function DrawNew() {
                             )}
                         />
                     </Form.Group>
-                    <Form.Group>
+                    <Form.Group controlId='body'>
                         <Form.Label>Body</Form.Label>
                             <Controller 
                                 control={control}

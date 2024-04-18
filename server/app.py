@@ -52,7 +52,6 @@ def deleter(id, model, schema):
     match = model.query.filter_by(id=id).first()
     if not match:
         return make_response({"error": f"{model} not found"}, 404)
-    match_dump = schema.dump(match)
 
     db.session.delete(match)
     db.session.commit()
@@ -191,18 +190,26 @@ class Follows(Resource):
     
 api.add_resource(Follows, '/follows')
 
-class FollowByID(Resource):
+class FollowByIDs(Resource): #has to be changed - Follow objects have two primary keys and no id column
+# i would handle this with cascade features of user, but i'd rather not mess with the relationships more atm
 
     def get(self, id): 
-        return getterFromID(id, Follow, follow_schema)
+        pass
     
     def patch(self, id):
-        return patcher(id, Follow, follow_schema)
+        pass
     
-    def delete(self, id):
-        return deleter(id, Follow, follow_schema)
+    def delete(self, following_id, followed_id):
+        match = Follow.query.filter_by(following_user_id=following_id, followed_user_id=followed_id).first()
+        if not match:
+            return make_response({"error": "follow not found"}, 404)
+
+        db.session.delete(match)
+        db.session.commit()
+
+        return make_response(follow_schema.dump(match), 200)
     
-api.add_resource(FollowByID, '/follows/<int:id>')
+api.add_resource(FollowByIDs, '/follows/<int:following_id>/<int:followed_id>')
 
 class EntitySchema(ma.SQLAlchemySchema):
 
@@ -277,8 +284,10 @@ class PostsFromFollowing(Resource):
         page_size = request.args.get('size', 10)
         offset = (page_number - 1) * page_size
         active_user = User.query.filter_by(id=session['user_id']).first()
-        followed_usernames = [entry.followed_user.username for entry in active_user.following] # over-nested
-        followed_posts = Entity.query.filter(Entity.parent_id.is_(None), Entity.user.username.in_(followed_usernames)).order_by(desc(Entity.created_at)).offset(offset).limit(page_size).all()
+        followed_usernames = [follow_obj.followed_user.username for follow_obj in User.query.filter_by(id=session['user_id']).first().following] # over-nested
+        # followed_posts = Entity.query.filter(Entity.parent_id.is_(None), Entity.user_p['username'].in_(followed_usernames)).order_by(desc(Entity.created_at)).offset(offset).limit(page_size).all()
+        # sqlalchemy doesn't allow indexing of properties like above, so a join is used instead
+        followed_posts = Entity.query.join(User).filter(Entity.parent_id.is_(None), User.username.in_(followed_usernames)).order_by(desc(Entity.created_at)).offset(offset).limit(page_size).all()
         return make_response({'posts': entities_schema.dump(followed_posts),
                               'page': page_number,
                               'size': page_size}, 200)
@@ -309,6 +318,17 @@ class EditingPost(Resource):
         return make_response(entity_schema.dump(post), 200)
     
 api.add_resource(EditingPost, '/drafts/<path:filename>') # might clash when trying to implement comment editing
+
+class DraftsFromUserID(Resource): 
+
+    def get(self, user_id):
+        if user_id != session.get('user_id'):
+            return make_response({'error': 'Not owner of drafts'}, 401)
+        drafts = Entity.query.filter(Entity.parent_id.is_(None), Entity.published.is_(False), Entity.user_id.is_(user_id)).all()
+        # other schemas for return should be specific like this one
+        return make_response(EntitySchema(only=('artwork_path', 'title', 'url'), many=True).dump(drafts), 200) 
+
+api.add_resource(DraftsFromUserID, '/drafts/<int:user_id>')
 
 class ArtworkSchema(ma.Schema): #add validation!
 

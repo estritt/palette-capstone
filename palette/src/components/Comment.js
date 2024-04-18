@@ -24,7 +24,7 @@ function Comment({ comment }) {
         {/* <Col className='md-auto'></Col> */}
         {!comment.parent_id ? <>
             <Col className='p-4 d-flex align-items-start'>
-                <a href={'/profile/' + comment.user_p.url.self.slice(-1)} className='d-inline-flex'>
+                <a href={'/profile/' + comment.user_p.url.self.split("=")[1]} className='d-inline-flex'>
                     <img src={avatar} height='50rem' style={{'backgroundColor': 'white'}} /> 
                     <p className='ps-3 pt-1'>{comment.user_p.username}</p>
                 </a>
@@ -35,7 +35,7 @@ function Comment({ comment }) {
                     <hr className='mx-auto' style={{'color': 'black','width':'90%','text-align':'left'}} />
                 </Col> </Row>
         </> : <><Col className='p-4 d-flex align-items-start'>
-                <a href={'/profile/' + comment.user_c.url.self.slice(-1)} className='d-inline-flex'>
+                <a href={'/profile/' + comment.user_c.url.self.split("=")[1]} className='d-inline-flex'>
                     <img src={avatar} height='50rem' style={{'backgroundColor': 'white'}} />
                     <p className='ps-3 pt-1'>{comment.user_c.username}</p>
                 </a>

@@ -38,7 +38,7 @@ function DrawEdit({ filename }) {
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d'); 
-        fetch(`/drafts/${filename}.jpg`)
+        fetch(`/drafts/${filename}.jpg`) // this view handles auth instead of authContext
         .then(response => {if (response.ok || response.status == 304) {
             setOwns(true);
             response.json()
@@ -94,6 +94,10 @@ function DrawEdit({ filename }) {
         // console.log(data);
         // console.log(post);
         // could add something to check if canvas image has changed to see if image handling is necessary 
+        if (typeof data.title !== 'string') {return} //should have actual form validation instead
+        if (data.title.length === 0) {return} //there are also max lengths for these in models.py
+        if (typeof data.body !== 'string') {return} 
+        if (data.title.body === 0) {return}
         canvasRef.current.toBlob(blob => {
             const file = new File([blob], 'image', {type: 'image/jpg'})
             const formData = new FormData(); // can't use JSON.stringify for files
@@ -104,7 +108,7 @@ function DrawEdit({ filename }) {
             })
             .then(response => response.json())
             .then(imageData => {
-                fetch(`/entities/${post.url.self.slice(-1)}`, { // pointless to use urls if reqs are done like this
+                fetch(`/entities/${post.url.self.split("=")[1]}`, { // pointless to use urls if reqs are done like this
                     method: 'PATCH',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -138,7 +142,7 @@ function DrawEdit({ filename }) {
             })
             .then(response => response.json())
             .then(imageData => {
-                fetch(`/entities/${post.url.self.slice(-1)}`, { // pointless to use urls if reqs are done like this
+                fetch(`/entities/${post.url.self.split("=")[1]}`, { // pointless to use urls if reqs are done like this
                     method: 'PATCH',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -182,6 +186,7 @@ function DrawEdit({ filename }) {
                 /> 
                 <div className='justify-content-center d-flex'>
                     <canvas 
+                        style={{'backgroundColor': 'white'}}
                         onMouseDown={startDrawing} 
                         onMouseUp={endDrawing} 
                         onMouseMove={draw} 

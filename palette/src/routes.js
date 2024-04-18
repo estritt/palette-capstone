@@ -24,7 +24,7 @@ const routes = [
                 element: <Create />
             },
             {
-                path: '/login',
+                path: '/login/:signupParam?',
                 element: <Login />
             },
             {

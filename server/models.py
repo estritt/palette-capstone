@@ -54,7 +54,7 @@ class User(db.Model):
     posts = relationship('Entity', primaryjoin="and_(User.id == Entity.user_id, Entity.parent_id.is_(None))", back_populates='user_p', viewonly=True)
     comments = relationship('Entity', primaryjoin="and_(User.id == Entity.user_id, Entity.parent_id.is_not(None))", back_populates='user_c', viewonly=True)
 
-    def __init__(self, username, password, avatar_filename=None, bio=None):
+    def __init__(self, username, password, avatar_filename='default.jpg', bio=None):
         # an init method ensures password hashing is carried out
         self.username = username
         self.password_hash = password
@@ -102,7 +102,7 @@ class Entity(db.Model):
 
     __table_args__ = (
         CheckConstraint(
-            "(parent_id IS NULL AND title IS NOT NULL AND artwork_path IS NOT NULL) OR (parent_id IS NOT NULL AND title IS NULL AND body IS NOT NULL)",
+            "(parent_id IS NULL AND title IS NOT NULL AND artwork_path IS NOT NULL) OR (parent_id IS NOT NULL AND title IS NULL AND body IS NOT NULL) OR (published = false AND parent_id IS NULL AND artwork_path IS NOT NULL)",
             name="check_post_or_comment"
         ),
     )

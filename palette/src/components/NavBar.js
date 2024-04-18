@@ -11,10 +11,10 @@ function NavBar() {
     const { activeUser, logout } = useAuth();
     const navigate = useNavigate();
 
-    // const handleLogout = () => {
-    //     logout();
-    //     navigate('/');
-    // };
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     return (
         <Navbar bg='primary' data-bs-theme='light' className='d-flex justify-content-between p-2' sticky='top'>
@@ -24,18 +24,19 @@ function NavBar() {
                 <NavLink as={Link} to='/'>Home</NavLink> 
                 {/* home link doesn't force reload but should */}
                 {activeUser && <NavLink as={Link} to='/following'>Following</NavLink>}
-                <NavLink className='me-auto' as={Link} to='/create'>Create</NavLink>
+                <NavLink className={activeUser || 'me-auto'} as={Link} to='/create'>Create</NavLink>
+                {activeUser && <NavLink className='me-auto' as={Link} to='/drafts'>Drafts</NavLink>}
                 {activeUser ? 
                     <>
                     {/* not a great way to get url */}
-                        <NavLink as={Link} to={'/profile/' + activeUser.url.self.slice(-1)}>{activeUser.username}</NavLink> 
+                        <NavLink as={Link} to={'/profile/' + activeUser.url.self.split("=")[1]}>{activeUser.username}</NavLink> 
                         <div className='px-3 d-flex align-items-center'> 
                         {/* makes button less tall */}
-                            <Button onClick={logout} size='sm' variant='danger' style={{'color': 'white'}}>logout</Button>
+                            <Button onClick={handleLogout} size='sm' variant='danger' style={{'color': 'white'}}>logout</Button>
                         </div>
                     </> : <>
                         <NavLink className='justify-left' as={Link} to='/login'>Login</NavLink>
-                        <NavLink as={Link} to='/login'>Signup</NavLink>
+                        <NavLink as={Link} to='/login/true'>Signup</NavLink>
                     </> 
                     // will have to link with signup=true or something
                 }

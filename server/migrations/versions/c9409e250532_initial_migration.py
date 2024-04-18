@@ -1,8 +1,8 @@
-"""initial
+"""initial migration
 
-Revision ID: 56fb97da7fdf
+Revision ID: c9409e250532
 Revises: 
-Create Date: 2024-04-09 17:25:07.101970
+Create Date: 2024-04-17 12:39:43.114338
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '56fb97da7fdf'
+revision = 'c9409e250532'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,7 +38,7 @@ def upgrade():
     sa.Column('body', sa.Text(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('last_updated', sa.TIMESTAMP(), nullable=True),
-    sa.CheckConstraint('(parent_id IS NULL AND title IS NOT NULL AND artwork_path IS NOT NULL) OR (parent_id IS NOT NULL AND title IS NULL AND body IS NOT NULL)', name='check_post_or_comment'),
+    sa.CheckConstraint('(parent_id IS NULL AND title IS NOT NULL AND artwork_path IS NOT NULL) OR (parent_id IS NOT NULL AND title IS NULL AND body IS NOT NULL) OR (published = false AND parent_id IS NULL AND artwork_path IS NOT NULL)', name='check_post_or_comment'),
     sa.ForeignKeyConstraint(['parent_id'], ['entities.id'], name=op.f('fk_entities_parent_id_entities')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_entities_user_id_users')),
     sa.PrimaryKeyConstraint('id')
