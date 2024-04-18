@@ -21,7 +21,10 @@ function NavBar() {
             {/* these don't have to both be flexboxes in the current state */}
             <Nav className="fs-4 flex-grow-1 my-2 my-lg-0" style={{ maxHeight: '100px' }}>
                 
-                <NavLink as={Link} to='/'>Home</NavLink> 
+                {/* I'd use Navbar.Brand but it breaks custom styling */}
+                <NavLink as={Link} to='/'><img style={{ maxHeight: '40px' }} src='/logo.png'/></NavLink>
+                <NavLink as={Link} to='/'>Palette</NavLink> 
+                
                 {/* home link doesn't force reload but should */}
                 {activeUser && <NavLink as={Link} to='/following'>Following</NavLink>}
                 <NavLink className={activeUser || 'me-auto'} as={Link} to='/create'>Create</NavLink>
