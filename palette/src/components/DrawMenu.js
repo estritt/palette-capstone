@@ -5,17 +5,18 @@ function DrawMenu({ setPrimaryColor, setLineWidth, setLineOpacity }) {
 
     return (
         <Container className='d-flex p-1 align-items-center'>
-            <DropdownButton title="File">
+            {/* <DropdownButton title="File">
                 <Dropdown.Item>Take 1</Dropdown.Item>
-            </DropdownButton>
-            <Button>
+            </DropdownButton> */}
+            <Button className='mx-1'>
                 <input 
                     type='color'
                     onChange={e => setPrimaryColor(e.target.value)}
                 />
             </Button>
-            <label>Brush thickness</label>
+            <label className='mx-1'>Brush thickness</label>
             <input 
+                className='mx-1'
                 type="range"
                 min="3"
                 max="20"
@@ -24,8 +25,9 @@ function DrawMenu({ setPrimaryColor, setLineWidth, setLineOpacity }) {
                     setLineWidth(e.target.value); 
                 }} 
             /> 
-            <label>Brush Opacity</label> 
+            <label className='mx-1'>Brush Opacity</label> 
             <input 
+                className='mx-1'
                 type="range"
                 min="1"
                 max="100"

@@ -53,13 +53,47 @@ function Profile() { // add useAuth to check if it's ur own profile for editing
     //     .catch(error => console.log(error));
     // }, [profile]);
 
+    const uploadPfp = async (uploadedPfp) => {
+        const formData = new FormData();
+        formData.append('image', uploadedPfp);
+        fetch('/avatars', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        // .then(imageData => imageData.blob())
+        .then(imageData => {
+            // url = URL.createObjectURL(blob)
+            fetch(`/users/${profile.url.self.split('=')[1]}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    'avatar_filename': imageData
+                })
+            })
+            .then(response => {
+                fetch(`/avatars/${profile.avatar_filename.slice(0,-4)}`, {// profile state still has the old pfp here
+                    method: 'DELETE'
+                }) 
+            })
+            .then(() => setProfile({
+                ...profile,
+                'avatar_filename': imageData
+            }))
+        })
+        
+    }
+
     const saveChanges = async (data) => { //will need to add stuff for updating avatar
 
         // for some reason, i am getting cyclic error from json stringify even though
         // it is returning the correct result. i use stringify on hook-form data
         // in the login page without having this issue. the try loop prevents
         // eslint from closing the page while still sending the right request
-
+        // if (data.pfp) {
+        //     await uploadPfp(data.pfp)
+        //     delete data['pfp']
+        // }
         Array.from(Object.entries(data)).forEach(([key, value]) => {
             if (!value) {delete data[key]} //remove empty inputs
         })
@@ -128,12 +162,28 @@ function Profile() { // add useAuth to check if it's ur own profile for editing
                                 />
                             {errors.username && <Form.Text>Username is required</Form.Text>}
                             </Form.Group>
-                            <Button type='submit' onClick={saveChanges} size="sm" className=''>save changes</Button>
-                            <div className='p-2'><Button  onClick={() => {reset(); setIsEditing(!isEditing)}} size="sm" className=''>discard changes</Button></div>
+                            <Button type='submit' onClick={saveChanges} size="sm" className=''>Save changes</Button>
+                            <div className='p-2'><Button  onClick={() => {reset(); setIsEditing(!isEditing)}} size="sm" className=''>Discard changes</Button></div>
                         </div>
                     </div>
                 </Col>
-            
+            <Row>
+                <Form.Group controlId='pfp' className='pt-3'>
+                    <Form.Label>Profile picture</Form.Label>
+                    <Controller
+                        control={control}
+                        name='pfp'
+                        render={({field: { onChange, onBlur, value, ref }}) => (
+                            <Form.Control 
+                                onChange={onChange} 
+                                value={value} 
+                                ref={ref} 
+                                type='file'
+                            />
+                        )}
+                    />
+                </Form.Group>
+            </Row>
             <Row>
                 <Form.Group controlId='bio' className='pt-3'> 
                 {/* would be useful to keep users from typing over the character limit */}

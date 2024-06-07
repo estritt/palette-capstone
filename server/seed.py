@@ -26,7 +26,7 @@ if __name__ == '__main__':
         second_post = Entity(user_id=first_user.id, published=True, title='mushroom', artwork_path='8fd0223a5acf4feea6a114080dbcf223.jpg', body='no clue what species it is')
         third_post = Entity(user_id=first_user.id, published=True, title='Agape', artwork_path='4d10ee946f014400b5ba784cb723d3c5.jpg', body='this was in my drafts for a long time')
         fourth_post = Entity(user_id=second_user.id, published=True, title='eye practice', artwork_path='47429c152f624859a3cc6d5d00c181bb.jpg', body='part of a larger study')
-        fifth_post = Entity(user_id=third_user.id, published=True, title='000', artwork_path='5ebc9f5cc4254c699f3adc1ea7326acd.jpg')
+        fifth_post = Entity(user_id=third_user.id, published=True, title='000', artwork_path='5ebc9f5cc4254c699f3adc1ea7326acd.jpg', body='part of a larger study')
         db.session.add_all([ first_post, second_post, third_post, fourth_post, fifth_post ])
         db.session.commit()
 

@@ -35,7 +35,7 @@ function NavBar() {
                         <NavLink as={Link} to={'/profile/' + activeUser.url.self.split("=")[1]}>{activeUser.username}</NavLink> 
                         <div className='px-3 d-flex align-items-center'> 
                         {/* makes button less tall */}
-                            <Button onClick={handleLogout} size='sm' variant='danger' style={{'color': 'white'}}>logout</Button>
+                            <Button onClick={handleLogout} size='sm' variant='danger' style={{'color': 'white'}}>Logout</Button>
                         </div>
                     </> : <>
                         <NavLink className='justify-left' as={Link} to='/login'>Login</NavLink>

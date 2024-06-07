@@ -22,6 +22,12 @@ function DrawEdit({ filename }) {
     const [ lineWidth, setLineWidth ] = useState(5);
     const [ primaryColor, setPrimaryColor ] = useState('black');
     const [ lineOpacity, setLineOpacity ] = useState(1.0);
+    const [ canvasLoaded, setCanvasLoaded ] = useState(false);
+
+    const [ newWidth, setNewWidth ] = useState(0);
+    const [ newHeight, setNewHeight ] = useState(0);
+
+    
 
     useEffect(() => { //must separate out the effects that handle line properties and the fetching
         const canvas = canvasRef.current;
@@ -32,7 +38,9 @@ function DrawEdit({ filename }) {
         ctx.strokeStyle = primaryColor;
         ctx.lineWidth = lineWidth;
         ctxRef.current = ctx;
-        
+        setNewWidth(canvasRef.current.width)
+        setNewHeight(canvasRef.current.height) //maybe in wrong hook?
+        setCanvasLoaded(true);
     }, [ primaryColor, lineOpacity, lineWidth ]);
 
     useEffect(() => {
@@ -84,7 +92,6 @@ function DrawEdit({ filename }) {
             e.nativeEvent.offsetX, 
             e.nativeEvent.offsetY 
         ); 
-  
         ctxRef.current.stroke(); 
     }; 
 
@@ -170,6 +177,18 @@ function DrawEdit({ filename }) {
         link.click();
     }
 
+    function handleCanvasResize(data) {
+        data.preventDefault();
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = canvasRef.current.width;
+        tempCanvas.height = canvasRef.current.height;
+        tempCtx.drawImage(canvasRef.current, 0, 0);
+        canvasRef.current.width = newWidth;
+        canvasRef.current.height = newHeight;
+        ctxRef.current.drawImage(tempCanvas, 0, 0);
+    }
+
     if (wrongName) {return <Container>Wrong file name!<canvas ref={canvasRef} /></Container>;}
 
     if (!owns) {return <Container>This isn't your image!<canvas ref={canvasRef} /></Container>;}
@@ -193,6 +212,28 @@ function DrawEdit({ filename }) {
                         ref={canvasRef} 
                     /> 
                 </div>
+                {canvasLoaded && // not using react-hook-form for this one
+                    <Form onSubmit={data => handleCanvasResize(data)} className='d-flex px-1 py-2'>
+                        <Form.Group classname='mb-3' controlId='width'>
+                            <Form.Label>Width</Form.Label>
+                            <Form.Control 
+                                type='number' 
+                                defaultValue={canvasRef.current.width} 
+                                onChange={e => setNewWidth(e.target.value)}
+                            />
+                        </Form.Group>
+                        <span className='px-2' style={{'margin-top':'2.3rem'}}>x</span>
+                        <Form.Group classname='mb-3' controlId='height'>
+                            <Form.Label>Height</Form.Label>
+                            <Form.Control 
+                                type='number' 
+                                defaultValue={canvasRef.current.height} 
+                                onChange={e => setNewHeight(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Button className='mx-2' style={{'margin-top':'2rem'}} type='submit'>Resize</Button>
+                    </Form>
+                }
             </div>
             {(post) &&
                 <Form onSubmit={handleSubmit(data => SubmitPublish(data, canvasRef))} onReset={reset} className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': '#ECECEC'}}>
@@ -230,7 +271,7 @@ function DrawEdit({ filename }) {
                             />
                     </Form.Group>
                     <Form.Group className='p-3 d-flex justify-content-end'>
-                        <Button type='submit'>Publish</Button>
+                        <Button className='mx-2' type='submit'>Publish</Button>
                         <Button className='mx-2' onClick={handleSubmit(data => SubmitDraft(data, canvasRef))}>Save Draft</Button>
                         <Button className='mx-2' onClick={handleSubmit(data => SubmitDownload(data, canvasRef))}>Download</Button>
                     </Form.Group>

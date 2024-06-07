@@ -9,6 +9,7 @@ function Post() {
     const { filename } = useParams();
     const [ artwork, setArtwork ] = useState();
     const [ post, setPost ] = useState(null);
+    
 
     useEffect(() => {
         fetch(`/posts/${filename}.jpg`) // get post by filename
@@ -24,9 +25,9 @@ function Post() {
     // console.log('post: ' + JSON.stringify(post))
     // console.log('artwork: ' + artwork)
 
-    if (!post) return <div>oops!</div> // handles initial render
+    if (!post) return <div>oops!</div>; // handles initial render
     // console.log('post being passed to comment: ' + JSON.stringify(post))
-    if (post.error) return <div>oops!</div>
+    if (post.error) return <div>oops! error</div>;
     return (
         <Container fluid className='p-6'>
             <Row className='border border-3 border-secondary square rounded-2 p-5 mb-5' style={{'backgroundColor': 'var(--background)'}}>
