@@ -1,1 +1,3 @@
 # palette-capstone
+
+Welcome! Palette is a site I created as my capstone project at the Flatiron School. It is a gallery site like ArtStation or DeviantArt, but with a focus on building community instead of showcasing one's portfolio and finding work. I achieved this by centering the submissions around a lightweight, in-browser paint program. The paint program itself allows canvas resizing, brush size, color, and opacity. The site, among other things, allows account customization (with your posts shown on your account page), drafts, following other users, and nested comments. 
